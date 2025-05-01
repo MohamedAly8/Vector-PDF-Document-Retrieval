@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PDF Vector Search</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        padding: 20px;
+        background-color: #f4f4f4;
+      }
+      h1 {
+        color: #333;
+      }
+      form {
+        margin-bottom: 20px;
+      }
+      input[type="text"] {
+        width: 60%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+      }
+      input[type="submit"] {
+        padding: 10px 20px;
+        border-radius: 5px;
+        border: none;
+        background-color: #28a745;
+        color: white;
+        cursor: pointer;
+      }
+      .relevant-pdf {
+        background-color: #fff;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      .chunk {
+        background-color: #e9ecef;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+      }
+      .chunk-score,
+      .chunk-page {
+        font-size: small;
+        color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Search Documents</h1>
+    <form method="POST">
+      <input
+        type="text"
+        name="query"
+        size="60"
+        placeholder="Enter your question here"
+      />
+      <input type="submit" value="Search" />
+    </form>
+
+    {% if results %}
+    <h2>Relevant Documents:</h2>
+    {% for result in results %}
+    <div class="relevant-pdf">
+      <h3>PDF: {{ result.filename }}</h3>
+      <p><b>Best Similarity Score:</b> {{ result.best_score }}</p>
+      <h4>Supporting Chunks:</h4>
+      {% if result.chunks %}
+      <ul>
+        {% for chunk in result.chunks %}
+        <li class="chunk">
+          <p>{{ chunk.content }}</p>
+          <p class="chunk-score">Score: {{ chunk.score }}</p>
+          {% if chunk.page %}
+          <p class="chunk-page">Page: {{ chunk.page }}</p>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No relevant chunks found for this document.</p>
+      {% endif %}
+    </div>
+    {% endfor %} {% endif %} {% if message %}
+    <p>{{ message }}</p>
+    {% endif %}
+  </body>
+</html>

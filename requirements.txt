@@ -1,0 +1,7 @@
+Flask
+langchain-community
+langchain-openai
+pypdf
+python-dotenv
+pymupdf
+faiss-cpu
