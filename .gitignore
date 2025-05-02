@@ -1,2 +1,4 @@
 my_faiss_index/
 pdf_documents/
+.DS_Store
+.env

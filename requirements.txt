@@ -5,3 +5,5 @@ pypdf
 python-dotenv
 pymupdf
 faiss-cpu
+unstructured
+unstructured[pdf]

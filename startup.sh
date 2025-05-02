@@ -1,12 +1,13 @@
 #!/bin/bash
 
-# Prompt the user for their OpenAI API key
-read -p "Enter your OpenAI API key: " OPENAI_API_KEY
 
-# Determine the absolute path to the directory containing PDF documents
+if ! command -v docker &> /dev/null; then
+  echo "Error: Docker is not installed or not in your PATH."
+  echo "Please install Docker to run this application."
+  exit 1
+fi
+
 PDF_DIR="$PWD/pdf_documents"
-
-# Determine the absolute path for the vector index (optional, for persistence)
 INDEX_DIR="$PWD/my_faiss_index"
 
 # Check if the PDF directory exists
@@ -16,9 +17,21 @@ if [ ! -d "$PDF_DIR" ]; then
   read -p "Press Enter once you've placed your PDFs in '$PDF_DIR'..."
 fi
 
-# Run the Docker container with volume mounts
+# Run container
 docker run -p 3333:3333 \
   -e OPEN_AI_KEY="$OPENAI_API_KEY" \
   -v "$PDF_DIR:/app/pdf_documents" \
   -v "$INDEX_DIR:/app/my_faiss_index" \
   vectors
+
+
+# Stop Container
+CONTAINER_ID=$(docker ps -q --filter ancestor=vectors)
+
+if [ -n "$CONTAINER_ID" ]; then
+  echo "Stopping Docker container: $CONTAINER_ID"
+  docker stop "$CONTAINER_ID"
+  docker rm "$CONTAINER_ID"
+else
+  echo "No running Docker container found for the 'vectors' image."
+fi
