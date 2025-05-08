@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template
 import os
-from main import create_index, find_relevant_pdfs_with_score_and_chunks
+from createIndex import create_index
+from documentSearch import find_relevant_pdfs_with_score_and_chunks
 import threading
 import logging
 
@@ -30,6 +31,10 @@ def start_indexing():
     else:
         print("Vector store already exists.")
 
+def renderLoading():
+    return render_template("loading.html")
+
+
 start_indexing() 
 
 @app.route("/", methods=["GET", "POST"])
@@ -39,15 +44,20 @@ def index():
 
     if isIndexing:
       if indexing_thread and indexing_thread.is_alive():
-        return render_template("loading.html")
+        renderLoading()
       else:
         isIndexing = False
         return render_template("index.html", results=None)
 
     results_with_chunks = []
+
+    query = ""
+    
     if request.method == "POST":
         query = request.form["query"]
+
         app.logger.debug(f"Query received: {query}")
+
         if query:
             app.logger.debug("Finding relevant PDFs...")
             relevant_pdfs_data = find_relevant_pdfs_with_score_and_chunks(query)
@@ -58,8 +68,7 @@ def index():
                     "best_score": f"{data['best_score']:.4f}",
                     "chunks": data["chunks"]
                 })
-            
-    return render_template("index.html", results=results_with_chunks)
+    return render_template("index.html", results=results_with_chunks, query=query)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=3333, debug=True)
